@@ -1,6 +1,8 @@
 (() => {
   "use strict";
 
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
   const header = document.querySelector("[data-header]");
   const menuButton = document.querySelector("[data-menu-button]");
   const menu = document.querySelector("[data-menu]");
@@ -205,17 +207,32 @@
     heading.focus({ preventScroll: true });
   };
 
+  const positionAfterEntrance = (target) => {
+    const root = document.documentElement;
+    const previousScrollBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    const applyPosition = () => {
+      if (target) target.scrollIntoView({ block: "start" });
+      else window.scrollTo(0, 0);
+    };
+    applyPosition();
+    window.requestAnimationFrame(() => {
+      applyPosition();
+      window.requestAnimationFrame(() => { root.style.scrollBehavior = previousScrollBehavior; });
+    });
+  };
+
   const targetAfterEntrance = () => {
     if (window.location.hash) {
       const target = document.querySelector(window.location.hash);
       if (target) {
-        target.scrollIntoView();
+        positionAfterEntrance(target);
         const heading = target.querySelector("h2, h1");
         if (heading) focusAfterEntrance(heading);
         return;
       }
     }
-    window.scrollTo(0, 0);
+    positionAfterEntrance(null);
     const heroTitle = document.querySelector("#hero-title");
     if (heroTitle) focusAfterEntrance(heroTitle);
   };
