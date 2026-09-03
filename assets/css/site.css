@@ -1,4 +1,12 @@
 @font-face {
+  font-family: "Satoshi";
+  src: url("../fonts/satoshi-variable.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Noto Sans JP";
   src: url("../fonts/noto-sans-jp.woff") format("woff");
   font-weight: 100 900;
@@ -26,7 +34,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--bg-deep); }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: "Noto Sans JP", "Hiragino Sans", sans-serif; line-height: 1.8; overflow-x: hidden; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", "Noto Sans JP", "Hiragino Sans", sans-serif; line-height: 1.8; overflow-x: hidden; }
 body.menu-open { overflow: hidden; }
 img, video { max-width: 100%; display: block; }
 a { color: inherit; }
