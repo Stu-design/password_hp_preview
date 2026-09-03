@@ -10,6 +10,7 @@
   const videoToggle = document.querySelector("[data-video-toggle]");
   const videoIcon = document.querySelector("[data-video-icon]");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const mobileTypewriter = window.matchMedia("(max-width: 860px)");
   const entrance = document.querySelector("[data-entrance]");
   const entranceConsole = document.querySelector("[data-entrance-console]");
   const entranceLabel = document.querySelector("[data-entrance-label]");
@@ -148,7 +149,8 @@
     if (!state || state.started) return;
     state.started = true;
     element.classList.add("is-typing");
-    const speed = Number(element.dataset.typewriterSpeed) || 55;
+    const baseSpeed = Number(element.dataset.typewriterSpeed) || 55;
+    const speed = Math.round(baseSpeed * (mobileTypewriter.matches ? 1.7 : 1.25));
     let pieceIndex = 0;
     let characterIndex = 0;
     const writeNext = () => {
