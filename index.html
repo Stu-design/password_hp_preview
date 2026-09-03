@@ -23,9 +23,9 @@
   <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/noto-sans-jp.woff" as="font" type="font/woff" crossorigin>
   <link rel="preload" href="assets/images/hero-poster.webp?v=20260903-hero" as="image" type="image/webp" fetchpriority="high">
-  <link rel="stylesheet" href="assets/css/site.css?v=20260903-xl-hero-logo">
+  <link rel="stylesheet" href="assets/css/site.css?v=20260903-password-scratch">
   <script>document.documentElement.classList.add("js");</script>
-  <script src="assets/js/site.js?v=20260903-hero-end-photo" defer></script>
+  <script src="assets/js/site.js?v=20260903-password-scratch" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -287,7 +287,12 @@
     <aside class="password-found" aria-label="見つけた合言葉">
       <div class="container narrow password-found-inner reveal">
         <p class="eyebrow">PASSWORD FOUND</p>
-        <p class="password-found-value">タランチュラ</p>
+        <div class="password-scratch" data-password-scratch role="button" tabindex="0" aria-label="こすって合言葉を表示" aria-describedby="password-scratch-help">
+          <p class="password-found-value" data-password-value>タランチュラ</p>
+          <canvas class="password-scratch-canvas" data-password-scratch-canvas aria-hidden="true"></canvas>
+          <span class="password-scratch-hint" data-password-scratch-hint aria-hidden="true"><b>SCRATCH</b>こすって表示</span>
+        </div>
+        <p class="password-scratch-help" id="password-scratch-help" data-password-scratch-help>指やマウスでこすってください</p>
         <a class="button button-line" href="https://lin.ee/wrCSHwp" data-track="line_click" data-position="password-found">公式LINEで合言葉を送る</a>
       </div>
     </aside>

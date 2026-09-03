@@ -226,6 +226,129 @@
     });
   });
 
+  const passwordScratch = document.querySelector("[data-password-scratch]");
+  const scratchCanvas = document.querySelector("[data-password-scratch-canvas]");
+  const passwordValue = document.querySelector("[data-password-value]");
+  const scratchHint = document.querySelector("[data-password-scratch-hint]");
+  const scratchHelp = document.querySelector("[data-password-scratch-help]");
+  if (passwordScratch && scratchCanvas) {
+    const scratchContext = scratchCanvas.getContext("2d", { willReadFrequently: true });
+    if (!scratchContext) {
+      scratchCanvas.hidden = true;
+      scratchHint && (scratchHint.hidden = true);
+      passwordScratch.removeAttribute("role");
+      passwordScratch.removeAttribute("tabindex");
+    } else {
+      let scratchRevealed = false;
+      let scratching = false;
+      let lastScratchPoint = null;
+      let scratchMoves = 0;
+
+      passwordValue?.setAttribute("aria-hidden", "true");
+
+      const paintScratchCover = () => {
+        if (scratchRevealed) return;
+        const bounds = passwordScratch.getBoundingClientRect();
+        const density = Math.min(window.devicePixelRatio || 1, 2);
+        scratchCanvas.width = Math.max(1, Math.round(bounds.width * density));
+        scratchCanvas.height = Math.max(1, Math.round(bounds.height * density));
+        scratchContext.setTransform(density, 0, 0, density, 0, 0);
+        scratchContext.globalCompositeOperation = "source-over";
+        const cover = scratchContext.createLinearGradient(0, 0, bounds.width, bounds.height);
+        cover.addColorStop(0, "#174b58");
+        cover.addColorStop(.48, "#32707d");
+        cover.addColorStop(1, "#0e3a45");
+        scratchContext.fillStyle = cover;
+        scratchContext.fillRect(0, 0, bounds.width, bounds.height);
+        scratchContext.fillStyle = "rgba(255,255,255,.08)";
+        scratchContext.save();
+        scratchContext.translate(-bounds.height * .3, 0);
+        scratchContext.rotate(-Math.PI / 9);
+        for (let x = 0; x < bounds.width + bounds.height; x += 18) {
+          scratchContext.fillRect(x, 0, 1, bounds.height * 2);
+        }
+        scratchContext.restore();
+      };
+
+      const revealPassword = (method) => {
+        if (scratchRevealed) return;
+        scratchRevealed = true;
+        scratching = false;
+        passwordScratch.classList.add("is-revealed");
+        passwordScratch.classList.remove("is-scratching");
+        passwordScratch.setAttribute("aria-label", "合言葉を表示しました");
+        passwordScratch.removeAttribute("role");
+        passwordScratch.removeAttribute("tabindex");
+        passwordValue?.removeAttribute("aria-hidden");
+        if (scratchHelp) scratchHelp.textContent = "合言葉を見つけました";
+        track("password_reveal", { method });
+        window.setTimeout(() => { scratchCanvas.hidden = true; }, 460);
+      };
+
+      const scratchPoint = (event) => {
+        const bounds = scratchCanvas.getBoundingClientRect();
+        return { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+      };
+
+      const eraseScratch = (from, to) => {
+        scratchContext.globalCompositeOperation = "destination-out";
+        scratchContext.lineCap = "round";
+        scratchContext.lineJoin = "round";
+        scratchContext.lineWidth = 36;
+        scratchContext.beginPath();
+        scratchContext.moveTo(from.x, from.y);
+        scratchContext.lineTo(to.x, to.y);
+        scratchContext.stroke();
+      };
+
+      const scratchedEnough = () => {
+        const pixels = scratchContext.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height).data;
+        let transparent = 0;
+        let sampled = 0;
+        for (let alpha = 3; alpha < pixels.length; alpha += 64) {
+          sampled += 1;
+          if (pixels[alpha] < 64) transparent += 1;
+        }
+        return sampled > 0 && transparent / sampled >= .42;
+      };
+
+      paintScratchCover();
+      window.addEventListener("resize", paintScratchCover);
+      scratchCanvas.addEventListener("pointerdown", (event) => {
+        if (scratchRevealed) return;
+        event.preventDefault();
+        scratchCanvas.setPointerCapture(event.pointerId);
+        scratching = true;
+        passwordScratch.classList.add("has-started", "is-scratching");
+        lastScratchPoint = scratchPoint(event);
+        eraseScratch(lastScratchPoint, lastScratchPoint);
+      });
+      scratchCanvas.addEventListener("pointermove", (event) => {
+        if (!scratching || scratchRevealed || !lastScratchPoint) return;
+        event.preventDefault();
+        const nextPoint = scratchPoint(event);
+        eraseScratch(lastScratchPoint, nextPoint);
+        lastScratchPoint = nextPoint;
+        scratchMoves += 1;
+        if (scratchMoves % 8 === 0 && scratchedEnough()) revealPassword("scratch");
+      });
+      const finishScratching = () => {
+        if (!scratching || scratchRevealed) return;
+        scratching = false;
+        lastScratchPoint = null;
+        passwordScratch.classList.remove("is-scratching");
+        if (scratchedEnough()) revealPassword("scratch");
+      };
+      scratchCanvas.addEventListener("pointerup", finishScratching);
+      scratchCanvas.addEventListener("pointercancel", finishScratching);
+      passwordScratch.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        revealPassword("keyboard");
+      });
+    }
+  }
+
   const revealItems = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && !reduceMotion.matches) {
     const revealObserver = new IntersectionObserver((entries, observer) => {

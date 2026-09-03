@@ -237,7 +237,16 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
 
 .password-found { padding: 54px 0 64px; border-top: 1px solid #397580; background: radial-gradient(circle at 50% 0, rgba(53,216,196,.1), transparent 45%), #08242d; text-align: center; }
 .password-found-inner { display: grid; justify-items: center; }
-.password-found-value { margin: 4px 0 24px; color: var(--highlight); font-size: clamp(30px,5vw,50px); font-weight: 700; letter-spacing: .12em; line-height: 1.35; }
+.password-scratch { position: relative; width: min(100%,520px); height: 112px; margin: 4px 0 12px; display: grid; place-items: center; border: 1px solid rgba(232,201,135,.6); border-radius: 16px; background: rgba(6,27,36,.72); box-shadow: inset 0 0 30px rgba(0,0,0,.2); overflow: hidden; }
+.password-found-value { margin: 0; color: var(--highlight); font-size: clamp(30px,5vw,50px); font-weight: 700; letter-spacing: .12em; line-height: 1.35; }
+.password-scratch-canvas, .password-scratch-hint { display: none; }
+.js .password-scratch-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; transition: opacity .45s ease; }
+.js .password-scratch.is-scratching .password-scratch-canvas { cursor: grabbing; }
+.js .password-scratch-hint { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #f4fafb; font-size: 12px; letter-spacing: .08em; pointer-events: none; transition: opacity .2s ease; }
+.password-scratch-hint b { color: var(--highlight); font-size: 10px; letter-spacing: .28em; }
+.password-scratch.has-started .password-scratch-hint, .password-scratch.is-revealed .password-scratch-hint, .password-scratch.is-revealed .password-scratch-canvas { opacity: 0; }
+.password-scratch.is-revealed { cursor: default; }
+.password-scratch-help { margin: 0 0 24px; color: var(--muted); font-size: 12px; letter-spacing: .03em; }
 
 .final-cta { background: radial-gradient(circle at 50% 0, rgba(56,189,248,.12), transparent 42%), linear-gradient(155deg,#082a34,#0d3540 55%,#092630); text-align: center; }
 .final-cta .narrow > p:not(.eyebrow) { max-width: 640px; margin: 28px auto 34px; color: #c4d8dc; }
