@@ -127,25 +127,26 @@
     }
   });
 
+  const focusAfterEntrance = (heading) => {
+    heading.tabIndex = -1;
+    heading.dataset.entranceFocus = "";
+    heading.addEventListener("blur", () => heading.removeAttribute("data-entrance-focus"), { once: true });
+    heading.focus({ preventScroll: true });
+  };
+
   const targetAfterEntrance = () => {
     if (window.location.hash) {
       const target = document.querySelector(window.location.hash);
       if (target) {
         target.scrollIntoView();
         const heading = target.querySelector("h2, h1");
-        if (heading) {
-          heading.tabIndex = -1;
-          heading.focus({ preventScroll: true });
-        }
+        if (heading) focusAfterEntrance(heading);
         return;
       }
     }
     window.scrollTo(0, 0);
     const heroTitle = document.querySelector("#hero-title");
-    if (heroTitle) {
-      heroTitle.tabIndex = -1;
-      heroTitle.focus({ preventScroll: true });
-    }
+    if (heroTitle) focusAfterEntrance(heroTitle);
   };
 
   const finishEntrance = (skipped = false) => {
