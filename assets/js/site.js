@@ -16,7 +16,6 @@
   const entranceText = document.querySelector("[data-entrance-text]");
   const entranceStatus = document.querySelector("[data-entrance-status]");
   const entranceSkip = document.querySelector("[data-entrance-skip]");
-  const entranceKey = "pw_entrance_seen_v2";
   let entranceStartedAt = 0;
   let entranceTyping;
   let entranceTimers = [];
@@ -156,7 +155,6 @@
     entranceTimers = [];
     const elapsed = Math.round(performance.now() - entranceStartedAt);
     entrance.classList.add("is-leaving");
-    try { localStorage.setItem(entranceKey, "1"); } catch { /* Device-local preference only. */ }
     track(skipped ? "entrance_skip" : "entrance_complete", { elapsed_ms: elapsed });
     window.setTimeout(() => {
       entrance.hidden = true;
@@ -170,12 +168,6 @@
   const runEntrance = () => {
     if (!entrance || reduceMotion.matches) {
       entrance && (entrance.hidden = true);
-      return false;
-    }
-    let seen = false;
-    try { seen = localStorage.getItem(entranceKey) === "1"; } catch { /* Continue for this page view. */ }
-    if (seen) {
-      entrance.hidden = true;
       return false;
     }
     entrance.hidden = false;
