@@ -127,6 +127,75 @@
     }
   });
 
+  const typewriterStates = new Map();
+  const prepareTypewriter = (element) => {
+    const textNodes = [...element.childNodes]
+      .filter((node) => node.nodeType === Node.TEXT_NODE && node.textContent.length > 0);
+    const fullText = element.textContent.replace(/\s+/g, " ").trim();
+    const pieces = textNodes.map((node) => ({ node, text: node.textContent }));
+    const caret = document.createElement("span");
+    caret.className = "typewriter-caret";
+    caret.setAttribute("aria-hidden", "true");
+    element.style.minHeight = `${Math.ceil(element.getBoundingClientRect().height)}px`;
+    element.setAttribute("aria-label", fullText);
+    pieces.forEach(({ node }) => { node.textContent = ""; });
+    element.classList.add("typewriter-ready");
+    typewriterStates.set(element, { pieces, caret, started: false });
+  };
+
+  const startTypewriter = (element) => {
+    const state = typewriterStates.get(element);
+    if (!state || state.started) return;
+    state.started = true;
+    element.classList.add("is-typing");
+    const speed = Number(element.dataset.typewriterSpeed) || 55;
+    let pieceIndex = 0;
+    let characterIndex = 0;
+    const writeNext = () => {
+      while (pieceIndex < state.pieces.length && characterIndex >= state.pieces[pieceIndex].text.length) {
+        pieceIndex += 1;
+        characterIndex = 0;
+      }
+      if (pieceIndex >= state.pieces.length) {
+        state.caret.remove();
+        element.classList.remove("is-typing");
+        element.classList.add("is-typed");
+        return;
+      }
+      const piece = state.pieces[pieceIndex];
+      piece.node.after(state.caret);
+      characterIndex += 1;
+      piece.node.textContent = piece.text.slice(0, characterIndex);
+      window.setTimeout(writeNext, speed);
+    };
+    writeNext();
+  };
+
+  if (!reduceMotion.matches) {
+    document.querySelectorAll("[data-typewriter]").forEach(prepareTypewriter);
+  }
+
+  let typewritersActivated = false;
+  const activateTypewriters = () => {
+    if (typewritersActivated || reduceMotion.matches) return;
+    typewritersActivated = true;
+    const heroCopy = document.querySelector(".hero-copy[data-typewriter]");
+    if (heroCopy) startTypewriter(heroCopy);
+    const sectionHeadings = document.querySelectorAll("main .section h2[data-typewriter]");
+    if ("IntersectionObserver" in window) {
+      const typewriterObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          startTypewriter(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: .35 });
+      sectionHeadings.forEach((heading) => typewriterObserver.observe(heading));
+    } else {
+      sectionHeadings.forEach(startTypewriter);
+    }
+  };
+
   const focusAfterEntrance = (heading) => {
     heading.tabIndex = -1;
     heading.dataset.entranceFocus = "";
@@ -162,6 +231,7 @@
       entrance.classList.remove("is-leaving", "is-granted");
       entranceConsole?.classList.remove("is-verifying", "is-granted");
       targetAfterEntrance();
+      activateTypewriters();
       if (!reduceMotion.matches) playVideo();
     }, 400);
   };
@@ -203,7 +273,10 @@
   entranceSkip?.addEventListener("click", () => finishEntrance(true));
 
   const entranceRunning = runEntrance();
-  if (!entranceRunning && !reduceMotion.matches) playVideo();
+  if (!entranceRunning && !reduceMotion.matches) {
+    activateTypewriters();
+    playVideo();
+  }
   else setVideoState(false);
 
   document.querySelectorAll("[data-qa-button]").forEach((button, index) => {
