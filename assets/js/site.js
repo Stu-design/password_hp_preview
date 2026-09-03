@@ -1,8 +1,6 @@
 (() => {
   "use strict";
 
-  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-
   const header = document.querySelector("[data-header]");
   const menuButton = document.querySelector("[data-menu-button]");
   const menu = document.querySelector("[data-menu]");
@@ -22,6 +20,7 @@
   let entranceStartedAt = 0;
   let entranceTyping;
   let entranceTimers = [];
+  let entranceHasFinished = false;
 
   const track = (eventName, params = {}) => {
     if (typeof window.gtag === "function") window.gtag("event", eventName, params);
@@ -209,32 +208,30 @@
 
   const positionAfterEntrance = (target) => {
     const root = document.documentElement;
-    const previousScrollBehavior = root.style.scrollBehavior;
-    root.style.scrollBehavior = "auto";
     const applyPosition = () => {
+      const previousScrollBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
       if (target) target.scrollIntoView({ block: "start" });
       else window.scrollTo(0, 0);
+      root.style.scrollBehavior = previousScrollBehavior;
     };
     applyPosition();
-    window.requestAnimationFrame(() => {
-      applyPosition();
-      window.requestAnimationFrame(() => { root.style.scrollBehavior = previousScrollBehavior; });
-    });
+    window.requestAnimationFrame(applyPosition);
   };
 
-  const targetAfterEntrance = () => {
+  const targetAfterEntrance = (moveFocus = true) => {
     if (window.location.hash) {
       const target = document.querySelector(window.location.hash);
       if (target) {
         positionAfterEntrance(target);
         const heading = target.querySelector("h2, h1");
-        if (heading) focusAfterEntrance(heading);
+        if (heading && moveFocus) focusAfterEntrance(heading);
         return;
       }
     }
     positionAfterEntrance(null);
     const heroTitle = document.querySelector("#hero-title");
-    if (heroTitle) focusAfterEntrance(heroTitle);
+    if (heroTitle && moveFocus) focusAfterEntrance(heroTitle);
   };
 
   const finishEntrance = (skipped = false) => {
@@ -246,7 +243,9 @@
     entrance.classList.add("is-leaving");
     track(skipped ? "entrance_skip" : "entrance_complete", { elapsed_ms: elapsed });
     window.setTimeout(() => {
+      document.documentElement.classList.remove("entrance-active");
       entrance.hidden = true;
+      entranceHasFinished = true;
       entrance.classList.remove("is-leaving", "is-granted");
       entranceConsole?.classList.remove("is-verifying", "is-granted");
       targetAfterEntrance();
@@ -258,9 +257,12 @@
   const runEntrance = () => {
     if (!entrance || reduceMotion.matches) {
       entrance && (entrance.hidden = true);
+      entranceHasFinished = true;
       return false;
     }
     entrance.hidden = false;
+    document.documentElement.classList.add("entrance-active");
+    window.scrollTo(0, 0);
     entranceStartedAt = performance.now();
     entrance.classList.remove("is-leaving", "is-granted");
     entranceConsole?.classList.remove("is-verifying", "is-granted");
@@ -297,6 +299,13 @@
     playVideo();
   }
   else setVideoState(false);
+
+  window.addEventListener("load", () => {
+    if (entranceHasFinished) targetAfterEntrance(false);
+  }, { once: true });
+  window.addEventListener("pageshow", () => {
+    if (entranceHasFinished) targetAfterEntrance(false);
+  });
 
   document.querySelectorAll("[data-qa-button]").forEach((button, index) => {
     const answer = document.getElementById(button.getAttribute("aria-controls"));
