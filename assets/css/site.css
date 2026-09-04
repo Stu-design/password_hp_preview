@@ -98,9 +98,10 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
 .hero-logo { width: clamp(260px,33vw,480px); height: auto; margin: 0 auto -24px; opacity: .98; }
 .hero h1 { margin: 0; color: rgba(244,250,251,.72); text-align: center; font-size: 14px; line-height: 1.2; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
 .hero-copy { margin: 22px 0 0; text-align: center; font-size: clamp(19px,1.6vw,24px); letter-spacing: .18em; }
-.hero-hours { margin: 14px 0 30px; color: var(--muted); letter-spacing: .12em; font-size: 13px; }
+.hero-hours { margin: 14px 0 30px; color: var(--muted); text-align: center; letter-spacing: .12em; font-size: 13px; }
 .hero-hours span { margin-left: 14px; letter-spacing: .08em; }
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.hero-actions .button { min-width: 210px; }
 .video-toggle { position: absolute; right: 32px; bottom: 32px; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(244,250,251,.38); background: rgba(4,17,23,.5); color: var(--text); cursor: pointer; backdrop-filter: blur(8px); }
 .hero-index { position: absolute; right: 96px; bottom: 38px; margin: 0; font-size: 10px; letter-spacing: .22em; color: rgba(244,250,251,.58); }
 
@@ -420,7 +421,7 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
 
 @media (max-width: 860px) {
   :root { --header-h: 60px; }
-  body { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  body { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
   .site-header { padding: 6px 20px; grid-template-columns: 1fr auto; }
   .brand { width: 102px; height: 48px; }
   .brand img { width: 72px; }
@@ -437,13 +438,16 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
   .js .global-nav.is-open { transform: none; }
   .hero { min-height: 100svh; }
   .hero-content, .container { width: calc(100% - 40px); }
-  .hero-content { padding: 150px 0 112px; }
+  .hero-content { padding: 136px 0 104px; }
   .hero-logo { width: 270px; margin-bottom: -14px; }
   .hero h1 { font-size: 12px; }
   .hero-copy { font-size: 17px; letter-spacing: .1em; }
-  .hero-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .hero-hours { margin-bottom: 24px; font-size: 12px; }
+  .hero-actions { display: grid; grid-template-columns: 1fr; width: min(220px,100%); margin: 0 auto; }
+  .hero-actions .button { min-width: 0; }
+  .hero-line-cta { display: none; }
   .button { padding: 0 14px; font-size: 14px; }
-  .video-toggle { right: 20px; bottom: 28px; }
+  .video-toggle { right: 20px; bottom: calc(86px + env(safe-area-inset-bottom)); }
   .hero-index { display: none; }
   .section { padding: 80px 0; }
   .section-heading { margin-bottom: 38px; }
@@ -454,12 +458,11 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
   .footer-grid > div:first-child { grid-column: 1 / -1; }
   .footer-privacy { width: calc(100% - 40px); }
   .copyright { width: calc(100% - 40px); }
-  .fixed-actions { position: fixed; z-index: 40; left: 12px; right: 12px; bottom: max(12px,env(safe-area-inset-bottom)); display: grid; grid-template-columns: .9fr 1.18fr .92fr; gap: 6px; padding: 6px; border: 1px solid rgba(105,228,212,.28); border-radius: 18px; background: rgba(6,27,36,.94); box-shadow: 0 12px 34px rgba(0,0,0,.4); backdrop-filter: blur(16px); }
-  .fixed-action { min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid transparent; border-radius: 12px; color: #fff; text-decoration: none; text-align: center; font-size: 12px; font-weight: 700; line-height: 1.15; letter-spacing: .01em; transition: transform .12s ease, background .12s ease, border-color .12s ease; }
-  .fixed-action small { color: inherit; font: inherit; font-size: 10px; letter-spacing: .03em; }
+  .fixed-actions { position: fixed; z-index: 40; left: 12px; right: 12px; bottom: max(10px,env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px; padding: 5px; border: 1px solid rgba(105,228,212,.28); border-radius: 16px; background: rgba(6,27,36,.94); box-shadow: 0 12px 34px rgba(0,0,0,.4); backdrop-filter: blur(16px); }
+  .fixed-action { min-width: 0; min-height: 52px; padding: 0 6px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; border: 1px solid transparent; border-radius: 11px; color: #fff; text-decoration: none; text-align: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1; letter-spacing: 0; transition: transform .12s ease, background .12s ease, border-color .12s ease; }
   .fixed-action:active { transform: translateY(1px); }
   .fixed-action-instagram { border-color: rgba(105,228,212,.36); background: #123f4b; }
-  .instagram-app-icon { position: relative; width: 22px; height: 22px; flex: 0 0 22px; border-radius: 6px; background: radial-gradient(circle at 30% 100%,#ffd600 0 18%,#ff7a00 34%,#ff0169 58%,#d300c5 76%,#7638fa 100%); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .instagram-app-icon { position: relative; width: 20px; height: 20px; flex: 0 0 20px; border-radius: 5px; background: radial-gradient(circle at 30% 100%,#ffd600 0 18%,#ff7a00 34%,#ff0169 58%,#d300c5 76%,#7638fa 100%); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
   .instagram-app-icon::before { content: ""; position: absolute; inset: 4px; border: 1.8px solid #fff; border-radius: 4px; }
   .instagram-app-icon::after { content: ""; position: absolute; left: 8px; top: 8px; width: 4px; height: 4px; border: 1.6px solid #fff; border-radius: 50%; box-shadow: 5px -5px 0 -1.3px #fff; }
   .fixed-action-contact { background: var(--line); }
@@ -468,7 +471,6 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
 
 @media (max-width: 560px) {
   .final-actions { grid-template-columns: 1fr; }
-  .hero-actions { grid-template-columns: 1fr; }
   .hero-copy { letter-spacing: .06em; }
   .hero-video, .hero-poster img { object-position: center 60%; }
   .hero-end-poster img { object-position: center; }
