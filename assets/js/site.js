@@ -175,8 +175,7 @@
   };
 
   if (!reduceMotion.matches) {
-    const heroTypewriter = document.querySelector(".hero-copy[data-typewriter]");
-    if (heroTypewriter) prepareTypewriter(heroTypewriter);
+    document.querySelectorAll("[data-typewriter]").forEach(prepareTypewriter);
   }
 
   let typewritersActivated = false;
@@ -185,6 +184,19 @@
     typewritersActivated = true;
     const heroCopy = document.querySelector(".hero-copy[data-typewriter]");
     if (heroCopy) startTypewriter(heroCopy);
+    const sectionHeadings = document.querySelectorAll("main .section h2[data-typewriter]");
+    if ("IntersectionObserver" in window) {
+      const typewriterObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          startTypewriter(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: .35 });
+      sectionHeadings.forEach((heading) => typewriterObserver.observe(heading));
+    } else {
+      sectionHeadings.forEach(startTypewriter);
+    }
   };
 
   const focusAfterEntrance = (heading) => {
