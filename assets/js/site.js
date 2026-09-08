@@ -372,7 +372,7 @@
         passwordScratch.removeAttribute("role");
         passwordScratch.removeAttribute("tabindex");
         passwordValue?.removeAttribute("aria-hidden");
-        if (scratchHelp) scratchHelp.textContent = "合言葉を見つけました";
+        if (scratchHelp) scratchHelp.textContent = "合言葉をLINEで送ると、30分延長無料";
         track("password_reveal", { method });
         window.setTimeout(() => { scratchCanvas.hidden = true; }, 460);
       };
